@@ -1,5 +1,5 @@
 # abot-widget
-A chat widget to embed on your website to interact with the abot
+A chat widget to embed on your website to interact with the abot. [http://dalewebb.github.io/abot-widget](http://dalewebb.github.io/abot-widget)
 
 ## Install
 
