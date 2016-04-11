@@ -57,7 +57,4 @@ Temporary Items
 .apdisk
 
 ###################################################
-build
-backup
-
-www/test
+!index.html
