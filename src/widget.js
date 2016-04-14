@@ -166,7 +166,7 @@ window.AbotChat = {
 
 
   sendMessage: function (msg, type) {
-	  var self = this;
+    var self = this;
     this.addMessage(msg, new Date(), 'guest', type);
     var msgContainer = document.querySelector(".abot-sheet-content");
     utils.scrollTo(msgContainer, msgContainer.scrollHeight, 400);
@@ -179,7 +179,7 @@ window.AbotChat = {
           FlexIDType: 2
       },
       success: function(data) {
-        this.addMessage(data, new Date(), 'abot', type);
+        self.addMessage(data, new Date(), 'abot', type);
         var msgContainer = document.querySelector(".abot-sheet-content");
         utils.scrollTo(msgContainer, msgContainer.scrollHeight, 400);
       }
