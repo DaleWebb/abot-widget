@@ -4,7 +4,7 @@ require("./widget.css");
 
 var elements = {};
 
-window.abot = {
+window.AbotChat = {
 	status: {
 		current: undefined,
 		last: undefined
