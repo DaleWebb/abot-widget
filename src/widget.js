@@ -122,12 +122,12 @@ window.AbotChat = {
 
 	// element event handlers
 	document.getElementById('abot-launcher-button').onclick = function (e) {
-	  abot.open();
+	  AbotChat.open();
 	};
 
 	if( document.getElementById('btnClose') != undefined ){
 	  document.getElementById('btnClose').onclick = function (e) {
-		abot.close();
+		AbotChat.close();
 	  };
 	}
 
@@ -149,7 +149,7 @@ window.AbotChat = {
 		message = encodeURIComponent(message);
 
 		if (message !== "") {
-		  abot.sendMessage(message);
+		  AbotChat.sendMessage(message);
 		}
 
 		elements.txMessage.value = "";
