@@ -16,9 +16,17 @@ This is packaged together with webpack, you will need this to compile your chang
 $ npm install webpack -g
 ```
 
-To continuously build the widget when files have changed, run the following command.
+To build the widget, run the following command.
 ```
 $ npm run build
+```
+
+## Testing
+This project uses Jasmine for unit tests, they are contained in the `tests/` folder.
+
+To run the tests, run the following command.
+```
+$ npm test
 ```
 
 ## Demo
@@ -36,7 +44,7 @@ then navigate to *http://localhost:8080* (you can change the port with `$ npm co
   <body>
     <script src="widget.js"></script>
     <script>
-      abot.init({
+      AbotChat.init({
         server: 'http://localhost:4200'//Point to the abot server
       });
     </script>
