@@ -10,7 +10,7 @@
   ],
   "main": "dist/widget.js",
   "scripts": {
-    "build": "webpack --progress --colors --watch",
+    "build": "webpack --progress --colors",
     "start": "node server.js",
     "test": "karma start karma.conf.js"
   },
