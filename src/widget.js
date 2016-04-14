@@ -1,5 +1,4 @@
 var utils = require('./utils.js');
-var JSON = require('./json2.js');
 require("./widget.css");
 
 var elements = {};
@@ -145,8 +144,6 @@ window.AbotChat = {
 		}
 
 		var message = elements.txMessage.value.toString().trim();
-		//message = utils.getEscapeHtml(message.replace(/^\s+|\s+$/g, ''));
-		message = encodeURIComponent(message);
 
 		if (message !== "") {
 		  AbotChat.sendMessage(message);
@@ -178,6 +175,7 @@ window.AbotChat = {
           FlexID: '+13105555555',
           FlexIDType: 2
       },
+      json: true,
       success: function(data) {
         self.addMessage(data, new Date(), 'abot', type);
         var msgContainer = document.querySelector(".abot-sheet-content");
