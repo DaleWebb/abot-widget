@@ -8,6 +8,7 @@ env:
 before_script:
     - date --rfc-2822
     - npm install
+    - npm install -g webpack
     - webpack
 
 script:
