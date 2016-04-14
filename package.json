@@ -11,7 +11,8 @@
   "main": "dist/widget.js",
   "scripts": {
     "build": "webpack --progress --colors --watch",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "karma start karma.conf.js"
   },
   "config": {
     "port": "8080"
@@ -24,7 +25,13 @@
     "gulp-minify-css": "^1.2.1",
     "gulp-uglify": "^1.4.2",
     "html-loader": "^0.4.3",
+    "jasmine": "^2.4.1",
+    "karma": "^0.13.22",
+    "karma-jasmine": "^0.3.8",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-sauce-launcher": "^0.3.1",
     "node-static": "^0.7.7",
+    "phantomjs-prebuilt": "^2.1.7",
     "rimraf": "^2.4.3",
     "run-sequence": "^1.1.4",
     "style-loader": "^0.13.1",

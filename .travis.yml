@@ -1,0 +1,13 @@
+language: node_js
+
+env:
+    global:
+        - SAUCE_USERNAME=dalewebb
+        - SAUCE_ACCESS_KEY=ada2f869-f632-427f-9a0f-e259ad70d857
+
+before_script:
+    - date --rfc-2822
+    - npm install
+
+script:
+    - npm test
