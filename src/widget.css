@@ -1368,12 +1368,13 @@
 
 
 #abot-offline-container .abot-form-container {
-    width:342px;margin:15px; border:1px solid #ddd;
+    width:95%;
+    margin:15px;
+    border:1px solid #ddd;
     border-radius: .66667rem;
     box-sizing: border-box;
     overflow: hidden!important;
     background: #fff;
-
 }
 
 #abot-offline-container .abot-form-container-header {
