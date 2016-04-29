@@ -6,181 +6,177 @@ var elements = {};
 window.AbotChat = {
 	status: {
 		current: undefined,
-		last: undefined
+		last: undefined,
+		sessionKey: undefined
 	},
-  init: function (config) {
-
-	  this.config = utils.mergeConfig({
-		  user: 'guest',
-		  server: undefined
+	init: function (config) {
+		this.config = utils.mergeConfig({
+			user: 'guest',
+			server: undefined
 		}, config);
+		var div_root = document.createElement('div');
+		div_root.id = 'abot';
+		div_root.innerHTML = require('./widget.html');
 
-	var div_root = document.createElement('div');
-	div_root.id = 'abot';
+		var _root = document.getElementsByTagName('body')[0];
+		_root.appendChild(div_root);
 
-	div_root.innerHTML = require('./widget.html');
+		elements.divLauncher = document.getElementById('abot-launcher');
+		elements.divChatbox = document.getElementById('abot-chatbox');
+		elements.txMessage = document.getElementById('txMessage');
 
-	var _root = document.getElementsByTagName('body')[0];
-	_root.appendChild(div_root);
+		document.querySelector('.abot-sheet-header-title').innerHTML = "Abot";
 
-	elements.divLauncher = document.getElementById('abot-launcher');
-	elements.divChatbox = document.getElementById('abot-chatbox');
-	elements.txMessage = document.getElementById('txMessage');
+		// Set a session key to uniquely identify this user across messages,
+		// enabling Abot to store memories. Perhaps this should be moved to
+		// localstorage?
+		this.status.sessionKey = String(Math.floor(Math.random() * 90000000) + 10000000);
 
-	document.querySelector('.abot-sheet-header-title').innerHTML = "Abot";
+		// Add Event on elements
+		this.initEventHandler();
+	},
+	open: function () {
+		utils.removeClass(elements.divLauncher, 'abot-launcher-active');
+		utils.addClass(elements.divLauncher, 'abot-launcher-inactive');
+		elements.divChatbox.style.display = 'block';
+		if (document.getElementById('abot-conversation') != undefined) {
+			utils.removeClass(document.getElementById('abot-conversation'), 'abot-inactive');
+			utils.addClass(document.getElementById('abot-conversation'), 'abot-active');
+		}
+	},
+	close: function () {
+		utils.removeClass(elements.divLauncher, 'abot-launcher-inactive');
+		utils.addClass(elements.divLauncher, 'abot-launcher-active');
+		elements.divChatbox.style.display = 'none';
+		if (document.getElementById('abot-conversation') != undefined) {
+		 utils.removeClass(document.getElementById('abot-conversation'), 'abot-active');
+		 utils.addClass(document.getElementById('abot-conversation'), 'abot-inactive');
+		}
+	},
+	addMessage: function (message, timestamp, user, type) {
+		var div_message = document.getElementById('abot-message');
 
-	// Add Event on elements
-	this.initEventHandler();
-  },
-  open: function () {
-	utils.removeClass(elements.divLauncher, 'abot-launcher-active');
-	utils.addClass(elements.divLauncher, 'abot-launcher-inactive');
-	elements.divChatbox.style.display = 'block';
-	if(document.getElementById('abot-conversation')!=undefined){
-	  utils.removeClass(document.getElementById('abot-conversation'), 'abot-inactive');
-	  utils.addClass(document.getElementById('abot-conversation'), 'abot-active');
-	}
-  },
-  close: function () {
-	utils.removeClass(elements.divLauncher, 'abot-launcher-inactive');
-	utils.addClass(elements.divLauncher, 'abot-launcher-active');
-	elements.divChatbox.style.display = 'none';
-	if(document.getElementById('abot-conversation')!=undefined){
-	  utils.removeClass(document.getElementById('abot-conversation'), 'abot-active');
-	  utils.addClass(document.getElementById('abot-conversation'), 'abot-inactive');
-	}
-  },
-  addMessage: function (message, timestamp, user, type) {
+		this.status.current = 'abot';
+		if (user == this.config.user) {
+		 this.status.current = 'user';
+		}
 
-	var div_message = document.getElementById('abot-message');
+		message = decodeURIComponent(message);
 
-	this.status.current = 'abot';
-	if (user == this.config.user) {
-	  this.status.current = 'user';
-	}
+		var msgClass = 'abot-embed-body';
+		var divClass = '';
+		var divCaret = '';
 
-	message = decodeURIComponent(message);
+		message = '<p>'+message+'</p>';
+		divCaret = '<div class="abot-comment-caret"></div>';
 
-	var msgClass = 'abot-embed-body';
-	var divClass = '';
-	var divCaret = '';
+		var msgHtml = '<div class="abot-comment-body-container"><div class="abot-comment-body '+msgClass+'">';
+		msgHtml = msgHtml + message + '</div>'+divCaret+'</div>';
 
-	message = '<p>'+message+'</p>';
-	divCaret = '<div class="abot-comment-caret"></div>';
+		var msgContainer = document.createElement("div");
+		utils.addClass(msgContainer, 'abot-comment abot-comment-by-' + this.status.current+" "+divClass);
+		msgContainer.innerHTML = msgHtml;
 
-	var msgHtml = '<div class="abot-comment-body-container"><div class="abot-comment-body '+msgClass+'">';
-	msgHtml = msgHtml + message + '</div>'+divCaret+'</div>';
-
-	var msgContainer = document.createElement("div");
-	utils.addClass(msgContainer, 'abot-comment abot-comment-by-' + this.status.current+" "+divClass);
-	msgContainer.innerHTML = msgHtml;
-
-	var t = document.querySelector('.abot-comment-metadata-container');
-	if (this.status.last != this.status.current) {
-	  if (t) {
-		utils.removeClass(t, 'abot-comment-metadata-container');
-		utils.addClass(t, 'abot-comment-metadata-container-static');
-	  }
-	} else {
-	  t.parentNode.removeChild(t);
-	}
-
-	window.metadata = this.metadata = document.createElement("div");
-	utils.addClass(this.metadata, "abot-comment-metadata-container");
-	this.metadata.innerHTML = '<div class="abot-comment-metadata"><span class="abot-comment-state"></span><span class="abot-relative-time">' + utils.secondsTohhmmss(timestamp) + '</span></div><div class="abot-comment-readstate"></div></div>';
-
-	msgContainer.appendChild(this.metadata);
-
-	msgHtml = msgContainer.outerHTML;
-
-	var classStr = 'abot-conversation-part abot-conversation-part-grouped';
-	if (this.status.last != this.status.current) {
-	  if (this.status.current == 'abot') { // add avatar image (on the first abot message)
-		  msgHtml = '<img src="' + require('./abot.svg') + '" class="abot-comment-avatar">' + msgHtml;
-	  }
-	  classStr = classStr + '-first';
-	}
-	classStr += " fromBottomToUp";
-	var chatDiv = document.createElement("div");
-	chatDiv.className = classStr;
-	chatDiv.innerHTML = msgHtml;
-
-	var removeClass = function () {
-	  this.classList.remove("fromBottomToUp");
-	  this.removeEventListener("animationend", removeClass, false);
-	};
-	chatDiv.addEventListener("animationend", removeClass, false);
-
-
-	div_message.appendChild(chatDiv);
-	div_message.scrollTop = div_message.scrollHeight;
-
-	this.status.last = this.status.current;
-  },
-  initEventHandler: function () {
-
-	// element event handlers
-	document.getElementById('abot-launcher-button').onclick = function (e) {
-	  AbotChat.open();
-	};
-
-	if( document.getElementById('btnClose') != undefined ){
-	  document.getElementById('btnClose').onclick = function (e) {
-		AbotChat.close();
-	  };
-	}
-
-	var fncTxMessageKeydown = function (e) {
-
-	  e = window.event || e;
-	  var keyCode = (e.which) ? e.which : e.keyCode;
-
-	  if (keyCode == 13 && !e.shiftKey) {
-
-		if (e.preventDefault) {
-		  e.preventDefault();
+		var t = document.querySelector('.abot-comment-metadata-container');
+		if (this.status.last != this.status.current) {
+			if (t) {
+				utils.removeClass(t, 'abot-comment-metadata-container');
+				utils.addClass(t, 'abot-comment-metadata-container-static');
+			}
 		} else {
-		  e.returnValue = false;
+			t.parentNode.removeChild(t);
 		}
 
-		var message = elements.txMessage.value.toString().trim();
+		window.metadata = this.metadata = document.createElement("div");
+		utils.addClass(this.metadata, "abot-comment-metadata-container");
+		this.metadata.innerHTML = '<div class="abot-comment-metadata">' +
+			'<span class="abot-comment-state"></span>' +
+			'<span class="abot-relative-time">' +
+			utils.secondsTohhmmss(timestamp) +
+			'</span></div><div class="abot-comment-readstate"></div>' +
+		'</div>';
 
-		if (message !== "") {
-		  AbotChat.sendMessage(message);
+		msgContainer.appendChild(this.metadata);
+		msgHtml = msgContainer.outerHTML;
+
+		var classStr = 'abot-conversation-part abot-conversation-part-grouped';
+		if (this.status.last != this.status.current) {
+			// add avatar image (on the first abot message)
+			if (this.status.current == 'abot') {
+				msgHtml = '<img src="' + require('./abot.svg') + '" class="abot-comment-avatar">' + msgHtml;
+			}
+			classStr = classStr + '-first';
+		}
+		classStr += " fromBottomToUp";
+		var chatDiv = document.createElement("div");
+		chatDiv.className = classStr;
+		chatDiv.innerHTML = msgHtml;
+
+		var removeClass = function () {
+			this.classList.remove("fromBottomToUp");
+			this.removeEventListener("animationend", removeClass, false);
+		};
+		chatDiv.addEventListener("animationend", removeClass, false);
+
+		div_message.appendChild(chatDiv);
+		div_message.scrollTop = div_message.scrollHeight;
+		this.status.last = this.status.current;
+	},
+	initEventHandler: function () {
+		// element event handlers
+		document.getElementById('abot-launcher-button').onclick = function (e) {
+			AbotChat.open();
+		};
+
+		if (document.getElementById('btnClose') != undefined) {
+			document.getElementById('btnClose').onclick = function (e) {
+				AbotChat.close();
+			};
 		}
 
-		elements.txMessage.value = "";
+		var fncTxMessageKeydown = function (e) {
+			e = window.event || e;
+			var keyCode = (e.which) ? e.which : e.keyCode;
 
-		return false;
-	  }
-	};
+			if (keyCode == 13 && !e.shiftKey) {
+				if (e.preventDefault) {
+					e.preventDefault();
+				} else {
+					e.returnValue = false;
+				}
 
-	if( elements.txMessage != undefined ){
-	  elements.txMessage.onkeydown = fncTxMessageKeydown;
+				var message = elements.txMessage.value.toString().trim();
+				if (message !== "") {
+					AbotChat.sendMessage(message);
+				}
+
+				elements.txMessage.value = "";
+				return false;
+			}
+		};
+		if (elements.txMessage != undefined) {
+			elements.txMessage.onkeydown = fncTxMessageKeydown;
+		}
+	},
+	sendMessage: function (msg, type) {
+		var self = this;
+		this.addMessage(msg, new Date(), 'guest', type);
+		var msgContainer = document.querySelector(".abot-sheet-content");
+		utils.scrollTo(msgContainer, msgContainer.scrollHeight, 400);
+		utils.minAjax({
+			url: self.config.server,
+			type: 'POST',
+			data: {
+				CMD: msg,
+				FlexID: self.status.sessionKey,
+				FlexIDType: 3
+			},
+			json: true,
+			success: function(data) {
+				self.addMessage(data, new Date(), 'abot', type);
+				var msgContainer = document.querySelector(".abot-sheet-content");
+				utils.scrollTo(msgContainer, msgContainer.scrollHeight, 400);
+			}
+		});
 	}
-
-},
-
-
-  sendMessage: function (msg, type) {
-    var self = this;
-    this.addMessage(msg, new Date(), 'guest', type);
-    var msgContainer = document.querySelector(".abot-sheet-content");
-    utils.scrollTo(msgContainer, msgContainer.scrollHeight, 400);
-    utils.minAjax({
-      url: self.config.server,
-      type: 'POST',
-      data: {
-          CMD: msg,
-          FlexID: '+13105555555',
-          FlexIDType: 2
-      },
-      json: true,
-      success: function(data) {
-        self.addMessage(data, new Date(), 'abot', type);
-        var msgContainer = document.querySelector(".abot-sheet-content");
-        utils.scrollTo(msgContainer, msgContainer.scrollHeight, 400);
-      }
-  });
-}
 };
